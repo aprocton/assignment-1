@@ -68,4 +68,27 @@ grep -c GAG$ test.fastq
 
 #### IV. Summarize sequence data file (2)
 
+To find each read, I used the regular expression `grep -EA3 '@[0-9]{5}_' test.fastq`. [This page](https://askubuntu.com/questions/27838/how-to-grep-2-or-3-lines-one-containing-the-text-i-want-and-the-others-just-be) explained how to find 3 lines after a match using `-A3`, and [this cheatsheet](http://web.mit.edu/hackl/www/lab/turkshop/slides/regex-cheatsheet.pdf) explained how to use `{5}` to repeat a match on exacly 5 digits, because the first line of each set of read data begins with an @ followed by 5 digits. I found that this did not work unless I enabled extended regular expressions using `-E`.
 
+I found a [link](https://stackoverflow.com/questions/16317961/how-to-process-each-line-received-as-a-result-of-grep-command) that suggested a `while read` loop would be an easier way to loop over the output of `grep`, and [another source](http://www.compciv.org/topics/bash/loops/) provided more details. Within the loop, `"taxon"` stores the taxon name as a string, found using `grep` to once again subset each read to just the first line and `cut` to find just the name. The read is then appended to a file with the same name as `taxon`.
+
+The code to combine all of these commands is as follows:
+
+```bash
+mkdir sorted_reads
+
+grep -EA3 '@[0-9]{5}_' test.fastq | while read line; do
+    taxon="$(echo $line|grep -E '@[0-9]{5}_'|\
+    cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"
+    echo $taxon
+done
+
+
+grep -EA3 '@[0-9]{5}_' test.fastq |\
+while read line
+do 
+   "taxon"=grep -E '@[0-9]{5}_' $line |\ 
+   cut -d ' ' -f 1|cut -d '.' -f 1| cut -d '_' -f 2
+   $line >> sorted_reads/
+done
+```
