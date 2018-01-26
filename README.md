@@ -1,5 +1,5 @@
 # PDSB Assignment 1
-### Alexander M. Procton / 1.25.2018
+Alexander M. Procton / 1.25.2018
 
 #### I. Get the data files
 
@@ -21,7 +21,7 @@ To view only the first 5 rows, I entered
 
 ```
 zless test.fastq.gz|head -5
-iris-data-dirty.csv|head -5
+head -5 iris-data-dirty.csv
 ```
 
 #### II. Clean the data
