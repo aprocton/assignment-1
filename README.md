@@ -92,3 +92,7 @@ do
    $line >> sorted_reads/
 done
 ```
+
+```bash
+head test.fastq|grep -EA3 '@[0-9]{5}_' | while read line; do taxon="$(echo $line|grep -E '@[0-9]{5}_'|cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"; echo $taxon; done
+```
