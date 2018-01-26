@@ -5,21 +5,21 @@ Alexander M. Procton / 1.25.2018
 
 To download the files using `curl`, I entered
    
-```
+```bash
 curl http://eaton-lab.org/pdsb/test.fastq.gz > test.fastq.gz
 curl http://eaton-lab.org/pdsb/iris-data-dirty.csv > iris-data-dirty.csv
 ```
 
 The commands to view the files are
 
-```
+```bash
 zless test.fastq.gz
 less iris-data-dirty.csv
 ```
 
 To view only the first 5 rows, I entered
 
-```
+```bash
 zless test.fastq.gz|head -5
 head -5 iris-data-dirty.csv
 ```
@@ -28,20 +28,20 @@ head -5 iris-data-dirty.csv
 
 I used Google to find a page which explained how to use `grep` to search for matches with multiple strings ([link](https://www.cyberciti.biz/faq/searching-multiple-words-string-using-grep/)). Using this pattern, I used the command
 
-```
+```bash
 grep -nv 'setosa\|versicolor\|virginica' iris-data-dirty.csv
 ```
 
 I found that two lines had misspellings:
 
-```
+```bash
 12:4.8,3.4,1.6,0.2,Iris-setsa
 51:7.0,3.2,4.7,1.4,Iris-versicolour
 ```
 
 Using `sed` to fix the spelling errors and `grep` to remove the lines with NAs, I made a clean file
 
-```
+```bash
 grep -v NA iris-data-dirty.csv| \
 sed 's/setsa/setosa/g'| \
 sed 's/versicolour/versicolor/g' > iris-data-clean.csv
@@ -49,7 +49,7 @@ sed 's/versicolour/versicolor/g' > iris-data-clean.csv
 
 To list the number of data values for each species, I used this command:
 
-```
+```bash
 cut -d ',' -f 5 iris-data-clean.csv | uniq -c | sort -r
   50 Iris-virginica
   50 Iris-setosa
@@ -61,7 +61,7 @@ cut -d ',' -f 5 iris-data-clean.csv | uniq -c | sort -r
 
 I unzipped the sequence file using `gunzip test.fastq.gz`. I looked up how to match the end of a line using `grep` ([link](https://unix.stackexchange.com/questions/124462/detecting-pattern-at-the-end-of-a-line-with-grep)), so I tried to use the pattern `^TGCAG*GAG$`. Unfortunately this gave me 0 results. I realized that every line of sequence data began with "TGCAG," so I matched only the end of lines and found 44 matches.
 
-```
+```bash
 grep -c GAG$ test.fastq
   44
 ```
