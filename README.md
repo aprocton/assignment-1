@@ -77,22 +77,10 @@ The code to combine all of these commands is as follows:
 ```bash
 mkdir sorted_reads
 
-grep -EA3 '@[0-9]{5}_' test.fastq | while read line; do
-    taxon="$(echo $line|grep -E '@[0-9]{5}_'|\
-    cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"
-    echo $taxon
+grep -E '@[0-9]{5}_' test.fastq| while read line
+  do  taxon="$(echo $line|grep -E '@[0-9]{5}_'|\
+  cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"
+  id="$(echo $line | cut -d ' ' -f 1-3)"
+  grep -ExA3 "$id" test.fastq >> sorted_reads/$taxon.txt
 done
-
-
-grep -EA3 '@[0-9]{5}_' test.fastq |\
-while read line
-do 
-   "taxon"=grep -E '@[0-9]{5}_' $line |\ 
-   cut -d ' ' -f 1|cut -d '.' -f 1| cut -d '_' -f 2
-   $line >> sorted_reads/
-done
-```
-
-```bash
-head test.fastq|grep -EA3 '@[0-9]{5}_' | while read line; do taxon="$(echo $line|grep -E '@[0-9]{5}_'|cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"; echo $taxon; done
 ```
