@@ -68,4 +68,23 @@ grep -c GAG$ test.fastq
 
 #### IV. Summarize sequence data file (2)
 
+To find each read, I used the regular expression `grep -E3 '@[0-9]{5}_' test.fastq` to search for the first line of each 4-line read. [This cheatsheet](http://web.mit.edu/hackl/www/lab/turkshop/slides/regex-cheatsheet.pdf) explained how to use `{5}` to repeat a match on exacly 5 digits, because the first line of each set of read data begins with an @ followed by 5 digits. I found that this did not work unless I enabled extended regular expressions using `-E`. 
 
+I found a [link](https://stackoverflow.com/questions/16317961/how-to-process-each-line-received-as-a-result-of-grep-command) that suggested a `while read` loop would be an easier way to loop over the output of `grep` than a `for` loop, and [another source](http://www.compciv.org/topics/bash/loops/) provided more details. 
+
+Within the loop, `"taxon"` stores the taxon name as a string, found using `cut` repeatedly to isolate the taxon name. `id` stores the unique contents of the label so that each read can be matched using `grep`. I tried to pass the output of `cut` directly to `grep test.fastq`, but I was unable to get this to parse , so the `id` variable solved this problem. These variables must be called out using the syntax`var="$()"`, which I learned from [this source](https://askubuntu.com/questions/410301/assigning-grep-output-to-a-variable).
+
+I isolated each read using the command `grep -ExA3 "$id" test.fastq` [This page](https://askubuntu.com/questions/27838/how-to-grep-2-or-3-lines-one-containing-the-text-i-want-and-the-others-just-be) explained how to find 3 lines after a match using `-A3`. The option `-x` requires exact matches, without which `grep` would match many reads for each `id` ([grep man page](https://ss64.com/bash/grep.html)). The read is appended to a `.txt` file within `/sorted_reads` with the same name as `taxon`.
+
+The complete code is as follows:
+
+```bash
+mkdir sorted_reads
+
+grep -E '@[0-9]{5}_' test.fastq| while read line
+  do  taxon="$(echo $line|grep -E '@[0-9]{5}_'|\
+  cut -d ' ' -f 1|cut -d '.' -f 1|cut -d '_' -f 2)"
+  id="$(echo $line | cut -d ' ' -f 1-3)"
+  grep -ExA3 "$id" test.fastq >> sorted_reads/$taxon.txt
+done
+```
